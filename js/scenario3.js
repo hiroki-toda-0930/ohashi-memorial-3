@@ -195,32 +195,6 @@ const SCENARIO = [
   { label: 'act2_gasshuku_end', type: 'chara_hide_all' },
   { type: 'bgm_stop', fadeOut: 1500 },
 
-  // ミニゲーム導入
-  { label: 'act2_minigame_intro', type: 'bg', file: 'kyoshitsu_yoru.jpg' },
-  { type: 'bgm', file: 'nazotoki.ogg', fadeIn: 1000 },
-  { type: 'text', name: '', text: '合宿最終日の夜。肝試し大会が始まった。' },
-  { type: 'chara', file: 'kuriki.png', pos: 'center' },
-  { type: 'text', name: '健太', text: 'この大学の研究棟には「七不思議」があるらしいぜ！\nペアで探検してこい！おおはしと涼介先輩、ペアな！' },
-  { type: 'chara_hide', pos: 'center' },
-  { type: 'chara', file: '05_odoroku.png', pos: 'left' },
-  { type: 'chara', file: 'kodama.png', pos: 'right' },
-  { type: 'text', name: 'おおはし', text: 'えぇ！？私ホラー苦手なんだけど・・・！' },
-  { type: 'text', name: '涼介', text: '大丈夫、僕がいるから。行こう。' },
-  { type: 'chara_hide_all' },
-
-  // ミニゲーム
-  { type: 'minigame_start', onComplete: 'act2_after_minigame' },
-
-  { label: 'act2_after_minigame', type: 'bg', file: 'yozora.jpg' },
-  { type: 'bgm', file: 'yugata.ogg' },
-  { type: 'chara', file: '02_yorokobu.png', pos: 'left' },
-  { type: 'chara', file: 'kodama.png', pos: 'right' },
-  { type: 'text', name: 'おおはし', text: 'ふう～怖かったけど、楽しかった！先輩のおかげで乗り越えられました！' },
-  { type: 'text', name: '涼介', text: 'おおはしの方がビビってるわりに積極的だったけどね。' },
-  { type: 'text', name: 'おおはし', text: '心の声：先輩と二人きりの冒険・・・ドキドキが止まらない。\nもうこれは完全に・・・好き、だよね。' },
-  { type: 'chara_hide_all' },
-  { type: 'bgm_stop', fadeOut: 1500 },
-
   // 好感度シナリオ導入
   { label: 'date_intro', type: 'bg', file: 'ekimae_hiru.jpg' },
   { type: 'overlay', color: 'rgba(0,0,0,0.7)' },
