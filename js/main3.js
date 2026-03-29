@@ -16,17 +16,38 @@ document.addEventListener('DOMContentLoaded', () => {
     btnContinue.style.pointerEvents = 'none';
   }
 
-  startScreen.addEventListener('click', () => {
+  // タップ・クリック両対応ヘルパー
+  const addTap = (el, handler) => {
+    let handled = false;
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (handled) return;
+      handled = true;
+      handler();
+      setTimeout(() => { handled = false; }, 300);
+    }, { passive: false });
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (handled) return;
+      handler();
+    });
+  };
+
+  // スタート画面
+  addTap(startScreen, () => {
     startScreen.classList.add('hidden');
   });
 
-  btnNewGame.addEventListener('click', () => {
+  // New Game
+  addTap(btnNewGame, () => {
     titleScreen.classList.add('hidden');
     engine.loadScenario(SCENARIO);
     engine.start();
   });
 
-  btnContinue.addEventListener('click', () => {
+  // Continue
+  addTap(btnContinue, () => {
     if (!engine.hasSaveData()) return;
     titleScreen.classList.add('hidden');
     engine.loadScenario(SCENARIO);
