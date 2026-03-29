@@ -12,6 +12,7 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 body {
@@ -20,6 +21,10 @@ body {
   font-family: 'HonyaJi', 'Hiragino Kaku Gothic Pro', 'Yu Gothic', sans-serif;
   user-select: none;
   -webkit-user-select: none;
+  overscroll-behavior: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* ===== Game Container ===== */
@@ -196,10 +201,16 @@ body {
   letter-spacing: 0.5px;
 }
 
-.choice-btn:hover, .choice-btn:active {
+.choice-btn:hover {
   background: linear-gradient(135deg, rgba(60, 80, 120, 0.95) 0%, rgba(80, 110, 170, 0.95) 100%);
   border-color: rgba(140, 180, 255, 0.7);
   transform: scale(1.02);
+}
+
+.choice-btn:active {
+  background: linear-gradient(135deg, rgba(80, 100, 150, 0.98) 0%, rgba(100, 130, 200, 0.98) 100%);
+  border-color: rgba(160, 200, 255, 0.9);
+  transform: scale(0.98);
 }
 
 .choice-btn.recommended::after {
@@ -366,6 +377,11 @@ body {
   border-color: rgba(140, 180, 255, 0.6);
 }
 
+.menu-item:active {
+  transform: scale(0.97);
+  background: linear-gradient(135deg, rgba(70, 95, 135, 0.98) 0%, rgba(90, 120, 175, 0.98) 100%);
+}
+
 .menu-item:last-child {
   margin-bottom: 0;
 }
@@ -426,6 +442,11 @@ body {
 .save-slot:hover {
   background: rgba(50, 70, 100, 0.9);
   border-color: rgba(120, 160, 220, 0.5);
+}
+
+.save-slot:active {
+  background: rgba(60, 85, 120, 0.95);
+  transform: scale(0.98);
 }
 
 .save-slot .slot-num {
@@ -494,6 +515,11 @@ body {
   background: linear-gradient(135deg, rgba(60, 85, 120, 0.95) 0%, rgba(80, 110, 160, 0.95) 100%);
   border-color: rgba(140, 180, 255, 0.7);
   transform: scale(1.03);
+}
+
+.title-btn:active {
+  transform: scale(0.97);
+  background: linear-gradient(135deg, rgba(70, 95, 135, 0.98) 0%, rgba(90, 120, 175, 0.98) 100%);
 }
 
 /* ===== Start Screen ===== */

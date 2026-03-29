@@ -57,28 +57,51 @@ class VNEngine {
 
   _bindEvents() {
     const container = document.getElementById('game-container');
-    container.addEventListener('click', (e) => this._onClick(e));
-    container.addEventListener('touchend', (e) => {
-      if (e.target.closest('#mini-menu, #full-menu, #saveload-screen, .choice-btn, #input-layer')) return;
-      e.preventDefault();
-      this._onClick(e);
-    });
+    this._isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    // Menu buttons
-    document.getElementById('btn-menu').addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.showMenu();
-    });
-    document.getElementById('btn-close-menu').addEventListener('click', () => this.hideMenu());
-    document.getElementById('btn-save').addEventListener('click', () => this.showSaveLoad('save'));
-    document.getElementById('btn-load').addEventListener('click', () => this.showSaveLoad('load'));
-    document.getElementById('btn-hide').addEventListener('click', () => this.toggleWindow());
-    document.getElementById('btn-skip').addEventListener('click', () => this.toggleSkip());
-    document.getElementById('btn-title').addEventListener('click', () => this.backToTitle());
-    document.getElementById('btn-back-menu').addEventListener('click', () => this.hideSaveLoad());
+    // UIパーツ（ボタン等）はclickイベントで処理
+    // ゲーム画面タップはtouchend優先、PCはclick
+    const interactiveSelector = '#mini-menu, #full-menu, #saveload-screen, .choice-btn, #input-layer, .menu-item, .title-btn, .mini-btn, .save-slot, button';
+
+    if (this._isTouchDevice) {
+      // タッチデバイス: touchendでゲーム進行、ボタンはclickのまま
+      container.addEventListener('touchend', (e) => {
+        if (e.target.closest(interactiveSelector)) return;
+        e.preventDefault();
+        this._onClick(e);
+      }, { passive: false });
+
+      // タッチ中のスクロール・ズーム防止
+      container.addEventListener('touchmove', (e) => {
+        if (!e.target.closest('#save-slots, #input-field')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    } else {
+      // PC: clickのみ
+      container.addEventListener('click', (e) => this._onClick(e));
+    }
+
+    // Menu buttons — タッチ・クリック両対応ヘルパー
+    const addTap = (el, handler) => {
+      el.addEventListener('click', (e) => { e.stopPropagation(); handler(); });
+      if (this._isTouchDevice) {
+        el.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); handler(); }, { passive: false });
+      }
+    };
+
+    addTap(document.getElementById('btn-menu'), () => this.showMenu());
+    addTap(document.getElementById('btn-close-menu'), () => this.hideMenu());
+    addTap(document.getElementById('btn-save'), () => this.showSaveLoad('save'));
+    addTap(document.getElementById('btn-load'), () => this.showSaveLoad('load'));
+    addTap(document.getElementById('btn-hide'), () => this.toggleWindow());
+    addTap(document.getElementById('btn-skip'), () => this.toggleSkip());
+    addTap(document.getElementById('btn-title'), () => this.backToTitle());
+    addTap(document.getElementById('btn-back-menu'), () => this.hideSaveLoad());
 
     // Input OK
-    document.getElementById('input-ok').addEventListener('click', () => this._onInputSubmit());
+    const inputOk = document.getElementById('input-ok');
+    addTap(inputOk, () => this._onInputSubmit());
     this.inputField.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this._onInputSubmit();
     });
@@ -326,8 +349,11 @@ class VNEngine {
       btn.className = 'choice-btn';
       if (choice.recommended) btn.classList.add('recommended');
       btn.textContent = choice.text;
-      btn.addEventListener('click', (e) => {
+
+      const handleChoice = (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        if (!this.waitingForChoice) return; // 二重タップ防止
         this.choiceLayer.classList.add('hidden');
         this.waitingForChoice = false;
         if (choice.set) {
@@ -342,7 +368,11 @@ class VNEngine {
         } else {
           this.next();
         }
-      });
+      };
+      btn.addEventListener('click', handleChoice);
+      if (this._isTouchDevice) {
+        btn.addEventListener('touchend', handleChoice, { passive: false });
+      }
       this.choiceLayer.appendChild(btn);
     });
   }
@@ -513,11 +543,16 @@ class VNEngine {
     btn.className = 'choice-btn';
     btn.textContent = 'タイトルに戻る';
     btn.style.maxWidth = '300px';
-    btn.addEventListener('click', (e) => {
+    const handleGO = (e) => {
+      e.preventDefault();
       e.stopPropagation();
       this.choiceLayer.classList.add('hidden');
       this.backToTitle();
-    });
+    };
+    btn.addEventListener('click', handleGO);
+    if (this._isTouchDevice) {
+      btn.addEventListener('touchend', handleGO, { passive: false });
+    }
     this.choiceLayer.appendChild(btn);
   }
 
@@ -662,17 +697,23 @@ class VNEngine {
       }
       btn.appendChild(info);
 
-      btn.addEventListener('click', () => {
+      const slotHandler = ((slotIdx, slotData) => (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (mode === 'save') {
-          this._saveToSlot(i);
+          this._saveToSlot(slotIdx);
           this.hideSaveLoad();
         } else {
-          if (data) {
-            this._loadFromSlot(i);
+          if (slotData) {
+            this._loadFromSlot(slotIdx);
             this.hideSaveLoad();
           }
         }
-      });
+      })(i, data);
+      btn.addEventListener('click', slotHandler);
+      if (this._isTouchDevice) {
+        btn.addEventListener('touchend', slotHandler, { passive: false });
+      }
 
       slots.appendChild(btn);
     }
