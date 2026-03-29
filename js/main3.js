@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // スタート画面
-  addTap(startScreen, () => {
+  // スタートボタン
+  addTap(document.getElementById('btn-start'), () => {
     startScreen.classList.add('hidden');
   });
 
